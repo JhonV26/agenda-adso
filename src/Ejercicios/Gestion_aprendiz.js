@@ -1,3 +1,4 @@
+// Ejercicio: Gestión de Aprendices
 const aprendices = [
   { id: 1, nombre: "Ana", ficha: 3223874, nota: 4.2 },
   { id: 2, nombre: "Luis", ficha: 3223874, nota: 3.5 },

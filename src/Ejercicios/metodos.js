@@ -1,3 +1,4 @@
+// Ejercicio: Métodos de Array
 const productos = [
   { nombre: "Laptop", precio: 1200000, stock: 5 },
   { nombre: "Mouse", precio: 35000, stock: 0 },

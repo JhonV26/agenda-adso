@@ -1,5 +1,5 @@
 // lista-tareas.js
-
+// Ejercicio: Mini Taller de Gestión de Tareas
 // Estado inicial: arreglo de objetos
 let tareas = [
   { id: 1, texto: "Instalar React", completada: false },

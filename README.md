@@ -64,16 +64,6 @@ Operador ternario
 
 Template strings
 
-💻 Lógica
-
-Se definen tres notas.
-
-Se calcula el promedio.
-
-Se valida si es mayor o igual a 3.0.
-
-Se imprime el estado en consola.
-
 📤 Salida esperada
 Ficha: 3223874
 Promedio: 4.10
@@ -151,12 +141,6 @@ find()
 
 map()
 
-📤 Ejemplo de salida
-Aprobados: [...]
-Promedio del grupo: 4.16
-Buscar 'Luis': { ... }
-Nombres: ["Ana", "Luis", "María"]
-
 🛒 Ejercicio 5: Métodos de Array – Inventario
 📌 Objetivo
 
@@ -184,7 +168,7 @@ reduce()
 
 map()
 
-✅ Ejercicio 6: Mini Taller – Agenda ADSO (Lista de Tareas)
+✅ Ejercicio 6: Mini Taller – Agenda ADSO
 📌 Objetivo
 
 Simular una aplicación básica de gestión de tareas en consola.
@@ -203,22 +187,6 @@ Filtrar pendientes
 
 Obtener estadísticas
 
-🧠 Conceptos aplicados
-
-Programación funcional
-
-Inmutabilidad
-
-map()
-
-filter()
-
-forEach()
-
-Operador ternario
-
-Spread operator
-
 📊 Ejemplo de estadísticas
 Total: 3 | Completadas: 1 | Pendientes: 2 | Progreso: 33.3%
 
@@ -232,27 +200,21 @@ Total: 3 | Completadas: 1 | Pendientes: 2 | Progreso: 33.3%
 ✔ Preparación para desarrollo en React
 
 ⚙️ Instalación y Ejecución
-
-1️⃣ Clonar el repositorio:
-
+1️⃣ Clonar el repositorio
 git clone https://github.com/JhonV26/agenda-adso
 
-
-2️⃣ Instalar dependencias:
-
+2️⃣ Instalar dependencias
 npm install
 
-
-3️⃣ Ejecutar proyecto:
-
+3️⃣ Ejecutar el proyecto
 npm run dev
 
 👩‍💻 Autor
 
-JhonV
+Jhon V26
 Ficha: 3229207
-Programa: ADSO
+Programa: ADSO – SENA
 
 📌 Conclusión
 
-Este proyecto fortalece las bases necesarias para avanzar hacia el desarrollo de aplicaciones completas en React, aplicando lógica real de negocio y buenas prácticas en JavaScript moderno.
+Agenda ADSO es un proyecto práctico que fortalece las bases de JavaScript moderno aplicadas dentro de un entorno profesional con React y Vite, preparando el camino hacia el desarrollo frontend con componentes reales.
