@@ -1,62 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
-import ContactoCard from "./components/ContactoCard";
 import FormularioContacto from "./components/FormularioContacto";
+import ContactoCard from "./components/ContactoCard";
 
 export default function App() {
 
-  const [contactos, setContactos] = useState([
-    {
-      id: 1,
-      nombre: "Jhon Vasquez",
-      telefono: "3001234567",
-      correo: "prueba@sena.edu.co",
-      etiqueta: "Yo mismo",
-    },
-  ]);
+  // 1. Leer contactos guardados en el navegador
+  const contactosGuardados =
+    JSON.parse(localStorage.getItem("contactos")) || [];
 
+  // 2. Crear estado con los contactos guardados
+  const [contactos, setContactos] = useState(contactosGuardados);
+
+  // 3. Guardar automáticamente cuando cambie el estado
+  useEffect(() => {
+    localStorage.setItem("contactos", JSON.stringify(contactos));
+  }, [contactos]);
+
+  // 4. Agregar contacto
   const agregarContacto = (nuevo) => {
-    setContactos((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...nuevo,
-      },
-    ]);
+    setContactos((prev) => [...prev, nuevo]);
   };
 
-  const eliminarContacto = (id) => {
+  // 5. Eliminar contacto por correo
+  const eliminarContacto = (correo) => {
     setContactos((prev) =>
-      prev.filter((c) => c.id !== id)
+      prev.filter((c) => c.correo !== correo)
     );
   };
 
   return (
     <main className="app-container">
 
-      <h1 className="app-title">
-        Agenda ADSO v2 📒
-      </h1>
+      <h1 className="app-title">Agenda ADSO v3</h1>
+
+      <p className="subtitulo">
+        Persistencia con localStorage + React
+      </p>
 
       <FormularioContacto onAgregar={agregarContacto} />
 
-      <section className="lista-contactos">
-
-        {contactos.map((c) => (
-
-          <ContactoCard
-            key={c.id}
-            id={c.id}
-            nombre={c.nombre}
-            telefono={c.telefono}
-            correo={c.correo}
-            etiqueta={c.etiqueta}
-            onDelete={eliminarContacto}
-          />
-
-        ))}
-
-      </section>
+      {contactos.map((contacto) => (
+        <ContactoCard
+          key={contacto.correo}
+          {...contacto}
+          onEliminar={eliminarContacto}
+        />
+      ))}
 
     </main>
   );
