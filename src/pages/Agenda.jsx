@@ -175,21 +175,44 @@ export default function Agenda() {
           </button>
         </div>
 
-        <div className="space-y-4">
-          {contactosOrdenados.map((c) => (
-            <div
-              key={c.id}
-              className="transition-all duration-300 ease-in-out transform hover:scale-[1.01]"
-            >
-              <ContactoCard
-                {...c}
-                busqueda={busqueda}
-                onEliminar={() => eliminarContacto(c.id)}
-                onEditar={() => setContactoEditando(c)}
-              />
-            </div>
-          ))}
+      <div className="space-y-4">
+
+  {/* Caso 1: No hay contactos en la base */}
+  {contactos.length === 0 && !cargando && (
+    <p className="text-gray-500 text-sm">
+      No hay contactos aún.
+    </p>
+  )}
+
+  {/* Caso 2: Hay contactos pero la búsqueda no encontró nada */}
+  {contactos.length > 0 &&
+    contactosOrdenados.length === 0 &&
+    !cargando && (
+      <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl text-sm">
+        🔎 No se encontraron contactos que coincidan con
+        <span className="font-semibold ml-1">
+          "{busqueda}"
+        </span>
+      </div>
+    )
+  }
+
+  {/* Caso 3: Mostrar resultados */}
+  {contactosOrdenados.map((c) => (
+     <div
+      key={c.id}
+      className="transition-all duration-300 ease-in-out transform hover:scale-[1.01]"
+        >
+          <ContactoCard
+            {...c}
+            busqueda={busqueda}
+            onEliminar={() => eliminarContacto(c.id)}
+            onEditar={() => setContactoEditando(c)}
+          />
         </div>
+      ))}
+
+    </div>
 
       </section>
 
