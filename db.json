@@ -20,6 +20,13 @@
       "telefono": "3105553789",
       "correo": "Goloso@gmail.com",
       "etiqueta": ""
+    },
+    {
+      "id": "e433",
+      "nombre": "Criss Valencia",
+      "telefono": "3105559820",
+      "correo": "melano@gmail.com",
+      "etiqueta": "prueba"
     }
   ]
 }
