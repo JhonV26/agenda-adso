@@ -8,11 +8,11 @@
       "etiqueta": "profe"
     },
     {
-      "id": "002e",
       "nombre": "Miguel ",
       "telefono": "3105554789",
       "correo": "Melano@gmail.com",
-      "etiqueta": ""
+      "etiqueta": "",
+      "id": "002e"
     },
     {
       "id": "01c8",
@@ -20,20 +20,6 @@
       "telefono": "3105553789",
       "correo": "Goloso@gmail.com",
       "etiqueta": ""
-    },
-    {
-      "nombre": "Criss Valencia",
-      "telefono": "3105559820",
-      "correo": "melano@gmail.com",
-      "etiqueta": "prueba",
-      "id": "e433"
-    },
-    {
-      "nombre": "Alberto",
-      "telefono": "3103339820",
-      "correo": "einstein@gmail.com",
-      "etiqueta": "Cerebero",
-      "id": "3c30"
     }
   ]
 }

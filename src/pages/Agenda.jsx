@@ -179,8 +179,8 @@ export default function Agenda() {
         {/* 👇 AQUÍ CONECTAMOS EL REF */}
         <div ref={formularioRef}>
           <FormularioContacto
-            agregarContacto={agregarContacto}
-            actualizarContacto={actualizarContacto}
+            onAgregar={agregarContacto}
+            onActualizar={editarContacto}
             contactoEditando={contactoEditando}
             cancelarEdicion={cancelarEdicion}
           />
