@@ -18,6 +18,8 @@ export default function Agenda() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [contactoEditando, setContactoEditando] = useState(null);
+  const [mensaje, setMensaje] = useState("");
+  const [contactoAEliminar, setContactoAEliminar] = useState(null);
 
   // 👇 Referencia al formulario
   const formularioRef = useRef(null);
@@ -60,6 +62,16 @@ export default function Agenda() {
     }
   }, [contactoEditando]);
 
+  const cancelarEdicion = () => {
+  setContactoEditando(null);
+
+  setMensaje("Cancelaste la edición ❌");
+
+  setTimeout(() => {
+    setMensaje("");
+  }, 3000);
+ };
+
   const agregarContacto = async (nuevo) => {
     try {
       const creado = await crearContacto(nuevo);
@@ -94,6 +106,22 @@ export default function Agenda() {
       setError("No se pudo eliminar el contacto");
     }
   };
+
+  const eliminarConfirmado = async () => {
+  if (!contactoAEliminar) return;
+
+  try {
+    await eliminarContacto(contactoAEliminar.id);
+    setContactoAEliminar(null);
+    setMensaje("Contacto eliminado correctamente 🗑️");
+  } catch (error) {
+    console.error(error);
+  }
+ };
+
+  const confirmarEliminar = (contacto) => {
+  setContactoAEliminar(contacto);
+ };
 
   // Filtrar contactos
   const contactosFiltrados = contactos.filter((c) => {
@@ -151,9 +179,10 @@ export default function Agenda() {
         {/* 👇 AQUÍ CONECTAMOS EL REF */}
         <div ref={formularioRef}>
           <FormularioContacto
-            onAgregar={agregarContacto}
-            onActualizar={editarContacto}
+            agregarContacto={agregarContacto}
+            actualizarContacto={actualizarContacto}
             contactoEditando={contactoEditando}
+            cancelarEdicion={cancelarEdicion}
           />
         </div>
 
@@ -204,17 +233,56 @@ export default function Agenda() {
       className="transition-all duration-300 ease-in-out transform hover:scale-[1.01]"
         >
           <ContactoCard
-            {...c}
-            busqueda={busqueda}
-            onEliminar={() => eliminarContacto(c.id)}
-            onEditar={() => setContactoEditando(c)}
-          />
+          {...c}
+          busqueda={busqueda}
+          onEliminar={() => confirmarEliminar(c)}
+          onEditar={() => setContactoEditando(c)}
+        />
         </div>
       ))}
 
     </div>
 
       </section>
+
+      {contactoAEliminar && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    
+    <div className="bg-white rounded-2xl shadow-lg p-6 w-[90%] max-w-md">
+      
+      <h2 className="text-lg font-bold text-gray-800 mb-2">
+        Confirmar eliminación
+      </h2>
+
+      <p className="text-gray-600 mb-4">
+        ¿Seguro que deseas eliminar el contacto
+        <span className="font-semibold ml-1">
+          {contactoAEliminar.nombre}
+        </span>?
+      </p>
+
+      <div className="flex justify-end gap-3">
+        
+        <button
+          onClick={() => setContactoAEliminar(null)}
+          className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
+        >
+          Cancelar
+        </button>
+
+        <button
+          onClick={eliminarConfirmado}
+          className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+        >
+          Eliminar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+ )}
 
     </main>
   );

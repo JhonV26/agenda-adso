@@ -3,8 +3,9 @@ import { useState, useEffect, useRef } from "react";
 export default function FormularioContacto({
   onAgregar,
   onActualizar,
-  contactoEditando
-}) {
+  contactoEditando,
+  cancelarEdicion
+}){
 
   const [form, setForm] = useState({
     nombre: "",
@@ -110,17 +111,28 @@ export default function FormularioContacto({
     }
   };
 
-  const cancelarEdicion = () => {
-    setForm({
-      nombre: "",
-      telefono: "",
-      correo: "",
-      etiqueta: "",
-    });
+ 
 
-    setErrores({});
+  const handleCancelar = () => {
+
+  // limpiar formulario
+  setForm({
+    nombre: "",
+    telefono: "",
+    correo: "",
+    etiqueta: "",
+  });
+
+  setErrores({});
+  setExito("Edición cancelada");
+
+  // salir del modo edición
+  cancelarEdicion();
+
+  setTimeout(() => {
     setExito("");
-  };
+  }, 3000);
+};
 
   return (
     <form
@@ -247,12 +259,13 @@ export default function FormularioContacto({
         {contactoEditando && (
           <button
             type="button"
-            onClick={cancelarEdicion}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-xl"
+            onClick={handleCancelar}
+            className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
           >
             Cancelar
           </button>
         )}
+        
 
       </div>
     </form>

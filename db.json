@@ -22,11 +22,18 @@
       "etiqueta": ""
     },
     {
-      "id": "e433",
       "nombre": "Criss Valencia",
       "telefono": "3105559820",
       "correo": "melano@gmail.com",
-      "etiqueta": "prueba"
+      "etiqueta": "prueba",
+      "id": "e433"
+    },
+    {
+      "nombre": "Alberto",
+      "telefono": "3103339820",
+      "correo": "einstein@gmail.com",
+      "etiqueta": "Cerebero",
+      "id": "3c30"
     }
   ]
 }
