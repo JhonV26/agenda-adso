@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import {
   listarContactos,
@@ -14,15 +15,18 @@ import ContactoCard from "../components/ContactoCard";
 
 export default function Agenda() {
 
+  /* ===============================
+     ESTADOS
+  =============================== */
+
   const [contactos, setContactos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+
   const [contactoEditando, setContactoEditando] = useState(null);
-  const [mensaje, setMensaje] = useState("");
   const [contactoAEliminar, setContactoAEliminar] = useState(null);
 
-  // 👇 Referencia al formulario
-  const formularioRef = useRef(null);
+  const [vista, setVista] = useState("crear");
 
   const [busqueda, setBusqueda] = useState(() => {
     return localStorage.getItem("busquedaAgenda") || "";
@@ -30,60 +34,114 @@ export default function Agenda() {
 
   const [ordenAsc, setOrdenAsc] = useState(true);
 
-  // Cargar contactos
+  const formularioRef = useRef(null);
+
+
+  /* ===============================
+     CONTROL DE VISTAS
+  =============================== */
+
+  const estaEnVistaCrear = vista === "crear";
+  const estaEnVistaContactos = vista === "contactos";
+
+  const irAVerContactos = () => {
+    setVista("contactos");
+    setContactoEditando(null);
+  };
+
+  const irACrearContacto = () => {
+    setVista("crear");
+    setContactoEditando(null);
+    setBusqueda("");
+  };
+
+
+  /* ===============================
+     CARGAR CONTACTOS
+  =============================== */
+
   useEffect(() => {
+
     async function cargarContactos() {
+
       try {
+
         const data = await listarContactos();
         setContactos(data);
+
       } catch (error) {
+
         console.error(error);
         setError("No se pudo cargar la lista de contactos");
+
       } finally {
+
         setCargando(false);
+
       }
+
     }
 
     cargarContactos();
+
   }, []);
 
-  // Guardar búsqueda en localStorage
+
+  /* ===============================
+     GUARDAR BUSQUEDA
+  =============================== */
+
   useEffect(() => {
     localStorage.setItem("busquedaAgenda", busqueda);
   }, [busqueda]);
 
-  // 👇 Scroll automático al editar
+
+  /* ===============================
+     SCROLL AL EDITAR
+  =============================== */
+
   useEffect(() => {
+
     if (contactoEditando && formularioRef.current) {
+
       formularioRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "start",
+        block: "start"
       });
+
     }
+
   }, [contactoEditando]);
 
-  const cancelarEdicion = () => {
-  setContactoEditando(null);
 
-  setMensaje("Cancelaste la edición ❌");
-
-  setTimeout(() => {
-    setMensaje("");
-  }, 3000);
- };
+  /* ===============================
+     CRUD
+  =============================== */
 
   const agregarContacto = async (nuevo) => {
+
     try {
+
       const creado = await crearContacto(nuevo);
+
       setContactos((prev) => [...prev, creado]);
+
+      setVista("contactos");
+
     } catch (error) {
+
       console.error(error);
       setError("No se pudo agregar el contacto");
+
     }
+
   };
 
+
   const editarContacto = async (id, datosActualizados) => {
+
     try {
+
       const actualizado = await actualizarContacto(id, datosActualizados);
 
       setContactos((prev) =>
@@ -91,64 +149,111 @@ export default function Agenda() {
       );
 
       setContactoEditando(null);
+      setVista("contactos");
+
     } catch (error) {
+
       console.error(error);
       setError("No se pudo actualizar el contacto");
+
     }
+
   };
 
+
   const eliminarContacto = async (id) => {
+
     try {
+
       await eliminarContactoPorId(id);
-      setContactos((prev) => prev.filter((c) => c.id !== id));
+
+      setContactos((prev) =>
+        prev.filter((c) => c.id !== id)
+      );
+
     } catch (error) {
+
       console.error(error);
       setError("No se pudo eliminar el contacto");
+
     }
+
+  };
+
+
+  /* ===============================
+     ELIMINAR
+  =============================== */
+
+  const confirmarEliminar = (contacto) => {
+    setContactoAEliminar(contacto);
   };
 
   const eliminarConfirmado = async () => {
-  if (!contactoAEliminar) return;
 
-  try {
-    await eliminarContacto(contactoAEliminar.id);
-    setContactoAEliminar(null);
-    setMensaje("Contacto eliminado correctamente 🗑️");
-  } catch (error) {
-    console.error(error);
-  }
- };
+    if (!contactoAEliminar) return;
 
-  const confirmarEliminar = (contacto) => {
-  setContactoAEliminar(contacto);
- };
+    try {
 
-  // Filtrar contactos
+      await eliminarContacto(contactoAEliminar.id);
+      setContactoAEliminar(null);
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+
+  /* ===============================
+     FILTRAR CONTACTOS
+  =============================== */
+
   const contactosFiltrados = contactos.filter((c) => {
+
     const termino = busqueda.toLowerCase();
 
     return (
       c.nombre.toLowerCase().includes(termino) ||
       c.correo.toLowerCase().includes(termino) ||
-      (c.etiqueta || "").toLowerCase().includes(termino) ||
-      (c.telefono || "").toLowerCase().includes(termino)
+      (c.telefono || "").toLowerCase().includes(termino) ||
+      (c.etiqueta || "").toLowerCase().includes(termino)
     );
+
   });
 
-  // Ordenar contactos
+
+  /* ===============================
+     ORDENAR CONTACTOS
+  =============================== */
+
   const contactosOrdenados = [...contactosFiltrados].sort((a, b) => {
+
     const nombreA = a.nombre.toLowerCase();
     const nombreB = b.nombre.toLowerCase();
 
     if (nombreA < nombreB) return ordenAsc ? -1 : 1;
     if (nombreA > nombreB) return ordenAsc ? 1 : -1;
+
     return 0;
+
   });
 
+
+  /* ===============================
+     UI
+  =============================== */
+
   return (
+
     <main className="min-h-screen bg-gray-50">
 
+      {/* HEADER */}
+
       <header className="max-w-6xl mx-auto px-6 pt-8">
+
         <p className="text-sm font-semibold text-gray-400 tracking-[0.25em] uppercase">
           Desarrollo Web ReactJS Ficha {APP_INFO.ficha}
         </p>
@@ -160,130 +265,226 @@ export default function Agenda() {
         <p className="text-gray-500 mt-1">
           {APP_INFO.subtitulo}
         </p>
-      </header>
 
-      <section className="max-w-6xl mx-auto px-6 py-8 space-y-6">
-
-        {error && (
-          <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {cargando && (
-          <div className="rounded-xl bg-purple-50 border border-purple-200 px-4 py-3 text-sm text-purple-700">
-            Cargando contactos desde la API...
-          </div>
-        )}
-
-        {/* 👇 AQUÍ CONECTAMOS EL REF */}
-        <div ref={formularioRef}>
-          <FormularioContacto
-            onAgregar={agregarContacto}
-            onActualizar={editarContacto}
-            contactoEditando={contactoEditando}
-            cancelarEdicion={cancelarEdicion}
-          />
-        </div>
-
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-7 mb-4">
-          <input
-            type="text"
-            placeholder="Buscar por nombre, correo o etiqueta..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            className="w-full md:flex-1 rounded-xl border-gray-400 text-sm"
-          />
+        <div className="mt-4">
 
           <button
-            type="button"
-            onClick={() => setOrdenAsc((prev) => !prev)}
-            className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-xl border border-gray-200"
+            onClick={estaEnVistaCrear ? irAVerContactos : irACrearContacto}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm"
           >
-            {ordenAsc ? "Ordenar Z-A" : "Ordenar A-Z"}
+            {estaEnVistaCrear
+              ? "Ver contactos"
+              : "Volver a crear contacto"}
           </button>
+
         </div>
 
-      <div className="space-y-4">
+      </header>
 
-  {/* Caso 1: No hay contactos en la base */}
-  {contactos.length === 0 && !cargando && (
-    <p className="text-gray-500 text-sm">
-      No hay contactos aún.
-    </p>
-  )}
 
-  {/* Caso 2: Hay contactos pero la búsqueda no encontró nada */}
-  {contactos.length > 0 &&
-    contactosOrdenados.length === 0 &&
-    !cargando && (
-      <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl text-sm">
-        🔎 No se encontraron contactos que coincidan con
-        <span className="font-semibold ml-1">
-          "{busqueda}"
-        </span>
-      </div>
-    )
-  }
+      {/* DASHBOARD */}
 
-  {/* Caso 3: Mostrar resultados */}
-  {contactosOrdenados.map((c) => (
-     <div
-      key={c.id}
-      className="transition-all duration-300 ease-in-out transform hover:scale-[1.01]"
-        >
-          <ContactoCard
-          {...c}
-          busqueda={busqueda}
-          onEliminar={() => confirmarEliminar(c)}
-          onEditar={() => setContactoEditando(c)}
-        />
+      <section className="max-w-6xl mx-auto px-6 py-8 grid md:grid-cols-3 gap-6">
+
+
+        {/* CONTENIDO PRINCIPAL */}
+
+        <div className="md:col-span-2 space-y-6">
+
+          {error && (
+            <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          {cargando && (
+            <div className="rounded-xl bg-purple-50 border border-purple-200 px-4 py-3 text-sm text-purple-700">
+              Cargando contactos desde la API...
+            </div>
+          )}
+
+
+          {/* FORMULARIO */}
+
+          {estaEnVistaCrear && (
+
+            <div ref={formularioRef}>
+
+              <FormularioContacto
+                onAgregar={agregarContacto}
+                onActualizar={editarContacto}
+                contactoEditando={contactoEditando}
+                cancelarEdicion={() => setContactoEditando(null)}
+              />
+
+            </div>
+
+          )}
+
+
+          {/* LISTA */}
+
+          {estaEnVistaContactos && (
+
+            <>
+
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-4">
+
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, correo o etiqueta..."
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  className="w-full md:flex-1 rounded-xl border-gray-400 text-sm"
+                />
+
+                <button
+                  onClick={() => setOrdenAsc((prev) => !prev)}
+                  className="bg-gray-100 text-gray-700 text-sm px-4 py-2 rounded-xl border border-gray-200"
+                >
+                  {ordenAsc ? "Ordenar Z-A" : "Ordenar A-Z"}
+                </button>
+
+              </div>
+
+
+              <div className="space-y-4">
+
+                <AnimatePresence>
+
+                  {contactosOrdenados.map((c) => (
+
+                    <motion.div
+                      key={c.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+
+                      <ContactoCard
+                        {...c}
+                        busqueda={busqueda}
+                        onEliminar={() => confirmarEliminar(c)}
+
+                        onEditar={() => {
+                          setContactoEditando(c);
+                          setVista("crear");
+                        }}
+
+                      />
+
+                    </motion.div>
+
+                  ))}
+
+                </AnimatePresence>
+
+              </div>
+
+            </>
+
+          )}
+
         </div>
-      ))}
 
-    </div>
+
+        {/* PANEL LATERAL */}
+
+        <aside className="space-y-6">
+
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-600 text-white p-6 rounded-2xl shadow-lg">
+
+            <h2 className="text-xl font-bold mb-2">
+              Agenda ADSO Dashboard
+            </h2>
+
+            <p className="text-sm opacity-90">
+              CRUD desarrollado con React + JSON Server
+            </p>
+
+            <div className="mt-6">
+
+              <p className="text-sm opacity-80">
+                Contactos registrados
+              </p>
+
+              <p className="text-3xl font-black">
+                {contactos.length}
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+
+            <h3 className="font-bold text-gray-800 mb-3">
+              Tips de código limpio
+            </h3>
+
+            <ul className="text-sm text-gray-600 space-y-2">
+
+              <li>✔ Usa nombres claros</li>
+              <li>✔ Evita duplicar lógica</li>
+              <li>✔ Un componente = una responsabilidad</li>
+              <li>✔ Mantén archivos pequeños</li>
+
+            </ul>
+
+          </div>
+
+        </aside>
 
       </section>
 
+
+      {/* MODAL ELIMINAR */}
+
       {contactoAEliminar && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    
-    <div className="bg-white rounded-2xl shadow-lg p-6 w-[90%] max-w-md">
-      
-      <h2 className="text-lg font-bold text-gray-800 mb-2">
-        Confirmar eliminación
-      </h2>
 
-      <p className="text-gray-600 mb-4">
-        ¿Seguro que deseas eliminar el contacto
-        <span className="font-semibold ml-1">
-          {contactoAEliminar.nombre}
-        </span>?
-      </p>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-      <div className="flex justify-end gap-3">
-        
-        <button
-          onClick={() => setContactoAEliminar(null)}
-          className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
-        >
-          Cancelar
-        </button>
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-[90%] max-w-md">
 
-        <button
-          onClick={eliminarConfirmado}
-          className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
-        >
-          Eliminar
-        </button>
+            <h2 className="text-lg font-bold text-gray-800 mb-2">
+              Confirmar eliminación
+            </h2>
 
-      </div>
+            <p className="text-gray-600 mb-4">
+              ¿Seguro que deseas eliminar el contacto
+              <span className="font-semibold ml-1">
+                {contactoAEliminar.nombre}
+              </span>?
+            </p>
 
-    </div>
+            <div className="flex justify-end gap-3">
 
-  </div>
- )}
+              <button
+                onClick={() => setContactoAEliminar(null)}
+                className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={eliminarConfirmado}
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+              >
+                Eliminar
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </main>
+
   );
+
 }
