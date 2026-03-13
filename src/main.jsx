@@ -1,13 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-// Importamos el componente raíz
 import App from "./App.jsx";
-// Importante: trae Tailwind a la app
 import "./index.css";
 
-// Punto de entrada de la app: renderiza <App /> dentro de #root
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+
+    <BrowserRouter>
+
+      <AuthProvider>
+
+        <App />
+        <Toaster position="top-right" />
+
+      </AuthProvider>
+
+    </BrowserRouter>
+
   </React.StrictMode>
 );

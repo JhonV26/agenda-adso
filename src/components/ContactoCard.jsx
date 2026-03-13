@@ -11,27 +11,28 @@ export default function ContactoCard({
   onEditar
 }) {
 
-  const resaltarTexto = (texto) => {
+  const resaltarTexto = (texto = "") => {
     if (!busqueda) return texto;
 
     const regex = new RegExp(`(${busqueda})`, "gi");
     return texto.replace(regex, "<mark>$1</mark>");
   };
 
-  const obtenerIniciales = (nombre) => {
-    if (!nombre) return "";
+const obtenerIniciales = (nombre = "") => {
 
-    const palabras = nombre.split(" ");
+  if (!nombre) return "";
 
-    const iniciales = palabras
-      .slice(0, 2)
-      .map((p) => p.charAt(0).toUpperCase())
-      .join("");
+  const palabras = nombre.split(" ");
 
-    return iniciales;
-  };
+  return palabras
+    .slice(0, 2)
+    .map((p) => p.charAt(0).toUpperCase())
+    .join("");
 
-const obtenerColor = (nombre) => {
+};
+
+const obtenerColor = (nombre = "") => {
+
   const colores = [
     "bg-red-500",
     "bg-blue-500",

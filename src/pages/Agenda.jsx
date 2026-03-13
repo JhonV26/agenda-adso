@@ -1,5 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
+
 
 import {
   listarContactos,
@@ -13,7 +17,15 @@ import { APP_INFO } from "../config/config.js";
 import FormularioContacto from "../components/FormularioContacto";
 import ContactoCard from "../components/ContactoCard";
 
-export default function Agenda() {
+export default function Agenda({ onLogout }) {
+
+  const { logout } = useAuth()
+  const navigate = useNavigate()
+
+  const cerrarSesion = () => {
+    logout()
+    navigate("/login")
+  }
 
   /* ===============================
      ESTADOS
@@ -120,65 +132,77 @@ export default function Agenda() {
 
   const agregarContacto = async (nuevo) => {
 
-    try {
+  try {
 
-      const creado = await crearContacto(nuevo);
+    const creado = await crearContacto(nuevo);
 
-      setContactos((prev) => [...prev, creado]);
+    setContactos((prev) => [...prev, creado]);
 
-      setVista("contactos");
+    toast.success("Contacto agregado correctamente ✅");
 
-    } catch (error) {
+    setVista("contactos");
 
-      console.error(error);
-      setError("No se pudo agregar el contacto");
+  } catch (error) {
 
-    }
+    console.error(error);
+    setError("No se pudo agregar el contacto");
 
-  };
+    toast.error("Error al agregar contacto ❌");
+
+  }
+
+ };
 
 
-  const editarContacto = async (id, datosActualizados) => {
+ const editarContacto = async (id, datosActualizados) => {
 
-    try {
+  try {
 
-      const actualizado = await actualizarContacto(id, datosActualizados);
+    const actualizado = await actualizarContacto(id, datosActualizados);
 
-      setContactos((prev) =>
-        prev.map((c) => (c.id === id ? actualizado : c))
-      );
+    setContactos((prev) =>
+      prev.map((c) => (c.id === id ? actualizado : c))
+    );
 
-      setContactoEditando(null);
-      setVista("contactos");
+    toast.success("Contacto actualizado ✏️");
 
-    } catch (error) {
+    setContactoEditando(null);
+    setVista("contactos");
 
-      console.error(error);
-      setError("No se pudo actualizar el contacto");
+  } catch (error) {
 
-    }
+    console.error(error);
+    setError("No se pudo actualizar el contacto");
 
-  };
+    toast.error("Error al actualizar contacto ❌");
+
+  }
+
+ };
 
 
   const eliminarContacto = async (id) => {
 
-    try {
+  try {
 
-      await eliminarContactoPorId(id);
+    await eliminarContactoPorId(id);
 
-      setContactos((prev) =>
-        prev.filter((c) => c.id !== id)
-      );
+    setContactos((prev) =>
+      prev.filter((c) => c.id !== id)
+    );
 
-    } catch (error) {
+    toast.success("Contacto eliminado 🗑️");
 
-      console.error(error);
-      setError("No se pudo eliminar el contacto");
+  } catch (error) {
 
-    }
+    console.error(error);
+    setError("No se pudo eliminar el contacto");
 
-  };
+    toast.error("Error al eliminar contacto ❌");
+
+  }
+
+ };
 
 
   /* ===============================
@@ -211,18 +235,18 @@ export default function Agenda() {
      FILTRAR CONTACTOS
   =============================== */
 
-  const contactosFiltrados = contactos.filter((c) => {
+const contactosFiltrados = contactos.filter((c) => {
 
-    const termino = busqueda.toLowerCase();
+  const termino = busqueda.toLowerCase();
 
-    return (
-      c.nombre.toLowerCase().includes(termino) ||
-      c.correo.toLowerCase().includes(termino) ||
-      (c.telefono || "").toLowerCase().includes(termino) ||
-      (c.etiqueta || "").toLowerCase().includes(termino)
-    );
+  return (
+    (c.nombre || "").toLowerCase().includes(termino) ||
+    (c.correo || "").toLowerCase().includes(termino) ||
+    (c.telefono || "").toLowerCase().includes(termino) ||
+    (c.etiqueta || "").toLowerCase().includes(termino)
+  );
 
-  });
+});
 
 
   /* ===============================
@@ -231,8 +255,8 @@ export default function Agenda() {
 
   const contactosOrdenados = [...contactosFiltrados].sort((a, b) => {
 
-    const nombreA = a.nombre.toLowerCase();
-    const nombreB = b.nombre.toLowerCase();
+    const nombreA = (a.nombre || "").toLowerCase();
+    const nombreB = (b.nombre || "").toLowerCase();
 
     if (nombreA < nombreB) return ordenAsc ? -1 : 1;
     if (nombreA > nombreB) return ordenAsc ? 1 : -1;
@@ -247,6 +271,8 @@ export default function Agenda() {
   =============================== */
 
   return (
+    
+    
 
     <main className="min-h-screen bg-gray-50">
 
@@ -275,6 +301,13 @@ export default function Agenda() {
             {estaEnVistaCrear
               ? "Ver contactos"
               : "Volver a crear contacto"}
+          </button>
+
+          <button
+            onClick={cerrarSesion}
+            className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+          >
+          Cerrar sesión
           </button>
 
         </div>
@@ -405,12 +438,12 @@ export default function Agenda() {
 
             <div className="mt-6">
 
-              <p className="text-sm opacity-80">
-                Contactos registrados
-              </p>
-
               <p className="text-3xl font-black">
                 {contactos.length}
+              </p>
+
+              <p className="text-xs opacity-70">
+                registrados en la agenda
               </p>
 
             </div>
